@@ -32,6 +32,9 @@ public class User {
     @Size(max = 120)
     private String password;
 
+    @Column(name = "verification_code")
+    private String verificationCode;
+
     private String name;
 
     private String address;
@@ -41,6 +44,8 @@ public class User {
     private String phone;
 
     private Boolean active;
+
+//    private String provider;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Order> orders;
@@ -207,5 +212,13 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
     }
 }

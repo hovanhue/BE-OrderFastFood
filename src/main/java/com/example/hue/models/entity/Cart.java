@@ -1,5 +1,8 @@
 package com.example.hue.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Set;
@@ -14,9 +17,11 @@ public class Cart {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cart")
+    @JsonBackReference
     private Set<CartDetail> cartDetails;
 
     public Cart() {

@@ -1,4 +1,4 @@
-package com.example.hue.jwt;
+package com.example.hue.sercurity.jwt;
 
 import com.example.hue.services.impl.UserServiceImpl;
 import io.jsonwebtoken.*;
@@ -6,11 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-@Component
+@Service
 public class JwtUtils {
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 

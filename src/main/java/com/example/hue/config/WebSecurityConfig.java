@@ -1,7 +1,8 @@
 package com.example.hue.config;
 
-import com.example.hue.jwt.AuthEntryPointJwt;
-import com.example.hue.jwt.AuthTokenFilter;
+import com.example.hue.sercurity.OAuth2.CustomerOAuth2UserService;
+import com.example.hue.sercurity.jwt.AuthEntryPointJwt;
+import com.example.hue.sercurity.jwt.AuthTokenFilter;
 import com.example.hue.services.impl.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
 
+	@Autowired
+	private CustomerOAuth2UserService oAuth2UserService;
+
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {
 		return new AuthTokenFilter();
@@ -57,16 +61,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors().and().csrf().disable()
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests().antMatchers("/api/auth/**").permitAll();
-//			.antMatchers("/api/test/**").permitAll()
-//			.antMatchers("/api/product/**").permitAll()
-//			.antMatchers("/api/product-category/**").permitAll()
-//			.antMatchers("/api/cart/**").permitAll()
-//			.antMatchers("/api/cart-detail/**").permitAll()
-//			.antMatchers("/api/order/**").permitAll()
-//			.antMatchers("/api/order-detail/**").permitAll()
-//			.antMatchers("/api/rate/**").permitAll()
-//			.anyRequest().authenticated();
+			.authorizeRequests().antMatchers("/api/auth/**").permitAll()
+			.antMatchers("/api/test/**").permitAll()
+			.antMatchers("/api/product/**").permitAll()
+			.antMatchers("/api/product-category/**").permitAll()
+			.antMatchers("/api/cart/**").permitAll()
+			.antMatchers("/api/cart-detail/**").permitAll()
+			.antMatchers("/api/order/**").permitAll()
+			.antMatchers("/api/order-detail/**").permitAll()
+			.antMatchers("/api/rate/**").permitAll()
+			.anyRequest().authenticated();
+//			.and()
+//				.oauth2Login()
+//				.loginPage("/api/auth/signin")
+//				.userInfoEndpoint()
+//				.userService(oAuth2UserService)
+//				.and()
+//				.and()
+//				.logout()
+//				.permitAll();
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
