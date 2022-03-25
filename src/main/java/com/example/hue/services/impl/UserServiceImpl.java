@@ -1,5 +1,7 @@
 package com.example.hue.services.impl;
 
+import com.example.hue.common.request.SignupRequest;
+import com.example.hue.models.dto.LocalUser;
 import com.example.hue.models.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,6 +39,9 @@ public class UserServiceImpl implements UserDetails {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
+//        return new LocalUser(String.valueOf(user.getId()), user.getPassword(), user.getActive(),
+//                true, true, true,
+//                authorities, user);
         return new UserServiceImpl(user.getId(), user.getUsername(), user.getEmail(),
                 user.getPassword(), authorities);
     }

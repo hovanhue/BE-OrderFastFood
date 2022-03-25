@@ -1,5 +1,7 @@
 package com.example.hue.sercurity.jwt;
 
+import com.example.hue.config.AppProperties;
+import com.example.hue.models.dto.LocalUser;
 import com.example.hue.services.impl.UserServiceImpl;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
@@ -20,9 +22,13 @@ public class JwtUtils {
 	@Value("${bezkoder.app.jwtExpirationMs}")
 	private int jwtExpirationMs;
 
-	public String generateJwtToken(Authentication authentication) {
+	private AppProperties appProperties;
 
+	public String generateJwtToken(Authentication authentication) {
 		UserServiceImpl userPrincipal = (UserServiceImpl) authentication.getPrincipal();
+//		LocalUser userPrincipal = (LocalUser) authentication.getPrincipal();
+//		Date now = new Date();
+//		Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMsec());
 
 		return Jwts.builder()
 				.setSubject((userPrincipal.getUsername()))
@@ -30,6 +36,8 @@ public class JwtUtils {
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
+//		return Jwts.builder().setSubject(Long.toString(userPrincipal.getUser().getId())).setIssuedAt(new Date()).setExpiration(expiryDate)
+//				.signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret()).compact();
 	}
 
 	public String getUserNameFromJwtToken(String token) {

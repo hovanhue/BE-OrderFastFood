@@ -1,4 +1,4 @@
-package com.example.hue.sercurity;
+package com.example.hue.sercurity.OAuth2;
 
 import com.example.hue.common.utils.CookieUtils;
 import com.nimbusds.oauth2.sdk.util.StringUtils;

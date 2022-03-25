@@ -38,8 +38,7 @@ public class ProductController {
     @GetMapping("/new")
     //@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<Page<ProductDTO>> getNewProductsPaginate(@RequestParam("page") Integer page,
-                                                                   @RequestParam("size") Integer size,
-                                                                   @RequestBody ProductDTO productDTO) {
+                                                                   @RequestParam("size") Integer size) {
         Page<ProductDTO> products = productService.getNewProduct(page, size);
         return ResponseEntity.ok(products);
 

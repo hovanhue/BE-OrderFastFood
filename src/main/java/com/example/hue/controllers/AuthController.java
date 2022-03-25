@@ -1,12 +1,18 @@
 package com.example.hue.controllers;
 
 import com.example.hue.common.enums.ERole;
+import com.example.hue.common.enums.SocialProvider;
+import com.example.hue.common.exception.UserAlreadyExistAuthenticationException;
 import com.example.hue.common.request.LoginRequest;
 import com.example.hue.common.request.ResetPassRequest;
 import com.example.hue.common.request.SignupRequest;
 import com.example.hue.common.request.VerifyRequest;
 import com.example.hue.common.response.JwtResponse;
 import com.example.hue.common.response.MessageResponse;
+import com.example.hue.common.utils.GeneralUtils;
+import com.example.hue.models.dto.ApiResponse;
+import com.example.hue.models.dto.JwtAuthenticationResponse;
+import com.example.hue.models.dto.LocalUser;
 import com.example.hue.models.entity.Cart;
 import com.example.hue.models.entity.Role;
 import com.example.hue.models.entity.User;
@@ -14,10 +20,13 @@ import com.example.hue.repositories.CartRepository;
 import com.example.hue.repositories.RoleRepository;
 import com.example.hue.repositories.UserRepository;
 import com.example.hue.sercurity.jwt.JwtUtils;
+import com.example.hue.services.UserService;
 import com.example.hue.services.impl.SendMail;
 import com.example.hue.services.impl.UserServiceImpl;
 import net.bytebuddy.utility.RandomString;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -59,21 +68,43 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    UserService userService;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
         UserServiceImpl userService = (UserServiceImpl) authentication.getPrincipal();
+//        LocalUser localUser = (LocalUser) authentication.getPrincipal();
         List<String> roles =  userService.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
+//        LocalUser localUser = null;
+//        try {
+//            localUser = (LocalUser) authentication.getPrincipal();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, GeneralUtils.buildUserInfo(localUser)));
         return ResponseEntity.ok(new JwtResponse(jwt, userService.getId(), userService.getUsername(), userService.getEmail(), roles));
     }
+
+//    @PostMapping("/signup")
+//    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+//        signUpRequest.setSocialProvider(SocialProvider.LOCAL);
+//        try {
+//            userService.registerNewUser(signUpRequest);
+//        } catch (UserAlreadyExistAuthenticationException e) {
+////			log.error("Exception Ocurred", e);
+//            return new ResponseEntity<>(new ApiResponse(false, "Email Address already in use!"), HttpStatus.BAD_REQUEST);
+//        }
+//        return ResponseEntity.ok().body(new ApiResponse(true, "User registered successfully"));
+//    }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest){
@@ -100,30 +131,32 @@ public class AuthController {
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(userRole);
         }
-        else {
-            strRoles.forEach(role -> {
-                switch (role){
-                    case "admin": Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
+//        else {
+//            strRoles.forEach(role -> {
+//                switch (role){
+//                    case "admin": Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+//                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//                        roles.add(adminRole);
+//
+//                        break;
+//                    case "mod":
+//                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//                        roles.add(modRole);
+//
+//                        break;
+//                    default:
+//                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//                        roles.add(userRole);
+//                }
+//            });
+//        }
 
-                        break;
-                    case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
-
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
-        }
         user.setRoles(roles);
         sendMail.sendMail(user.getEmail(), "Đăng kí thành công", "Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi");
-
+        user.setProvider(String.valueOf(SocialProvider.LOCAL));
+        user.setActive(true);
         User _user = userRepository.save(user);
         Cart cart = new Cart(new BigDecimal(0.0), _user);
         cartRepository.save(cart);
@@ -146,7 +179,7 @@ public class AuthController {
                 String subject = "Hãy xác thực email của bạn";
                 String mailContent = "";
                 mailContent = "Xin chào " + user.get().getUsername() + " Nhấn vào link sau để xác thực email của bạn: " +
-                        confirmUrl + " Link Xác thực( nhấn vào đây)!" +
+                        confirmUrl + " ( nhấn vào đây)! " +
                         " \nOLL-SHOP XIN CẢM ƠN";
                 sendMail.sendMail(user.get().getEmail(), subject, mailContent);
 
@@ -160,8 +193,10 @@ public class AuthController {
 
     @PostMapping("/verify-password")
     public ResponseEntity<?> VerifyPassword(@RequestBody VerifyRequest code) {
-        Boolean isVerified = userRepository.findUserByVerificationCode(code.getCode());
-        if (isVerified) {
+        System.out.println("ss");
+        User isVerified = userRepository.findUserByVerificationCode(code.getCode());
+        System.out.println(isVerified.getVerificationCode());
+        if (isVerified.getVerificationCode().equals(code.getCode())) {
             return ResponseEntity.ok(new MessageResponse("accepted"));
         } else {
             return ResponseEntity.ok(new MessageResponse("error"));

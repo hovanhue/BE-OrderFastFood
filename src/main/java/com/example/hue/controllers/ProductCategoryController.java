@@ -20,20 +20,20 @@ public class ProductCategoryController {
     ProductCategoryService productCategoryService;
 
     @GetMapping
-    public List<ProductCategoryDTO> getAllProducts() {
+    public List<ProductCategoryDTO> getAllProductsCategory() {
         return productCategoryService.getAll();
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductCategoryDTO> getAllProductsPaginate(@PathVariable("id") long id) {
+    public ResponseEntity<ProductCategoryDTO> getAllProductsCategoryPaginate(@PathVariable("id") long id) {
         ProductCategoryDTO products = productCategoryService.findByid(id);
         return new ResponseEntity<ProductCategoryDTO>(products, HttpStatus.OK);
     }
 
 
     @GetMapping("/all")
-    public ResponseEntity<Page<ProductCategoryDTO>> getAllProductsPaginate(@RequestParam("page") Integer page,
+    public ResponseEntity<Page<ProductCategoryDTO>> getAllProductsCategoryPaginate(@RequestParam("page") Integer page,
                                                                            @RequestParam("size") Integer size) {
         Page<ProductCategoryDTO> products = productCategoryService.getAllPaginate(page, size);
 
@@ -41,21 +41,26 @@ public class ProductCategoryController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ProductCategoryDTO> getAllProductsPaginate(@RequestParam("name") String name) {
+    public ResponseEntity<ProductCategoryDTO> getAllProductsCategoryPaginate(@RequestParam("name") String name) {
         ProductCategoryDTO products = productCategoryService.getByName(name);
         return ResponseEntity.ok(products);
     }
 
 
     @PostMapping
-    public ResponseEntity<ProductCategoryDTO> createProduct(@Valid @RequestBody ProductCategoryDTO product) {
+    public ResponseEntity<ProductCategoryDTO> createProductCategory(@Valid @RequestBody ProductCategoryDTO product) {
         ProductCategoryDTO newProduct = productCategoryService.save(product);
         return new ResponseEntity<ProductCategoryDTO>(newProduct, HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProductCategory(@Valid @RequestBody ProductCategoryDTO categoryDTO, @PathVariable("id") long id){
+        ProductCategoryDTO newDdto = productCategoryService.update(categoryDTO, id);
+        return new ResponseEntity<>(newDdto, HttpStatus.OK);
+    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ProductCategory> deleteProduct(@PathVariable("id") long id) {
+    public ResponseEntity<ProductCategory> deleteProductCategory(@PathVariable("id") long id) {
         productCategoryService.delete(id);
         return ResponseEntity.ok().build();
     }

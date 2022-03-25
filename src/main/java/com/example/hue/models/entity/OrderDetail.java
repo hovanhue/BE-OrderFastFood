@@ -1,5 +1,7 @@
 package com.example.hue.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,10 +14,12 @@ public class OrderDetail {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+
     private Order order;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonBackReference
     private Product product;
 
     public OrderDetail() {

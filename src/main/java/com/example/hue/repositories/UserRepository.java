@@ -30,7 +30,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void addVerificationCode(String code, String username);
 
     @Transactional
-    @Query(value = "select * from users where verification_code =?1",nativeQuery = true)
-    Boolean findUserByVerificationCode(String verifyCode);
+    @Query(value = "select * from users where verification_code =?1 and active=true",nativeQuery = true)
+    User findUserByVerificationCode(String verifyCode);
 
+//    User findUserByVerificationCodeAndActive(String code);
 }

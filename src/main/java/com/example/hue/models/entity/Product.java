@@ -54,12 +54,15 @@ public class Product {
     private ProductCategory category;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+    @JsonIgnore
     private Set<OrderDetail> orderDetails;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+    @JsonIgnore
     private Set<CartDetail> cartDetails;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+    @JsonIgnore
     private Set<Rates> rates;
 
     public Product() {

@@ -1,5 +1,7 @@
 package com.example.hue.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -41,9 +43,11 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
+    @JsonIgnore
     private Set<OrderDetail> orderDetails;
 
     public Order() {

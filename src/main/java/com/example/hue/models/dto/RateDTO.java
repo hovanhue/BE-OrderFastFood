@@ -1,7 +1,5 @@
 package com.example.hue.models.dto;
 
-import com.example.hue.models.entity.User;
-
 import java.util.Date;
 
 public class RateDTO {
@@ -14,7 +12,7 @@ public class RateDTO {
 
 	private Date dateRate;
 
-	private User user;
+	private Long userId;
 
 	private Long productId;
 
@@ -23,12 +21,12 @@ public class RateDTO {
 		// TODO Auto-generated constructor stub
 	}
 
-	public User getUser() {
-		return user;
+	public Long getUserId() {
+		return userId;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
 	public Long getProductId() {
