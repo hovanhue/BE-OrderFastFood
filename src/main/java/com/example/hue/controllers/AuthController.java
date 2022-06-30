@@ -154,7 +154,9 @@ public class AuthController {
 //        }
 
         user.setRoles(roles);
+
         sendMail.sendMail(user.getEmail(), "Đăng kí thành công", "Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi");
+
         user.setProvider(String.valueOf(SocialProvider.LOCAL));
         user.setActive(true);
         User _user = userRepository.save(user);
